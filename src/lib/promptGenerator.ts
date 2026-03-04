@@ -77,18 +77,24 @@ function getAestheticRules(aesthetic: string | null): string {
 
 export function generatePrompt(state: PromptState): string {
     const formatLabel = getLabel('format', state.format);
-    const targetAILabel = getLabel('targetAI', state.targetAI);
     const aestheticLabel = getLabel('aesthetic', state.aesthetic);
+    const audienceLabel = getLabel('targetAudience', state.targetAudience);
+    const contentLabel = getLabel('contentStrategy', state.contentStrategy);
+    const projectName = state.projectName ? state.projectName : 'My Project';
     const featureLabels = getLabels('features', state.features);
 
     const isVisualOnly = state.targetAI === 'midjourney';
 
     if (isVisualOnly) {
-        return `# Master Image Generation Prompt: ${formatLabel}
+        return `# Master Image Generation Prompt: ${projectName} (${formatLabel})
 
 ## [Project Overview]
-You are a master AI image generator. Please create a highly detailed, professional UI/UX design mockup for a **${formatLabel}**. 
+You are a master AI image generator. Please create a highly detailed, professional UI/UX design mockup for a **${formatLabel}** named **${projectName}**. 
 This is not a real application, but a conceptual design to be used for inspiration and client presentation.
+
+## [Target Audience & Content Tone]
+- **Target Audience**: ${audienceLabel || 'General'}
+- **Content Vibe**: ${contentLabel !== 'None - I have my own' ? contentLabel : 'Use lorem ipsum but make it look realistic'}
 
 ## [Target AI Rules]
 ${getTargetAIRules(state.targetAI)}
@@ -107,12 +113,16 @@ ${getTargetAIRules(state.targetAI)}
 `;
     }
 
-    return `# Master System Blueprint: ${formatLabel}
+    return `# Master System Blueprint: ${projectName} (${formatLabel})
 
 ## [Project Overview]
-You are an expert Full-Stack Engineer, UI/UX Designer, and Product Architect. Your task is to build a production-ready **${formatLabel}**.
+You are an expert Full-Stack Engineer, UI/UX Designer, and Product Architect. Your task is to build a production-ready **${formatLabel}** named **${projectName}**.
 The objective is to synthesize a perfectly structured, accessible, and performant application based on the constraints and requirements outlined below.
 Do not hallucinate unnecessary dependencies. Stick strictly to the defined tech stack and aesthetic guidelines.
+
+## [Target Audience & Content Tone]
+- **Target Audience**: Ensure the UX, language, and complexity level are perfectly tailored for **${audienceLabel || 'a general audience'}**.
+- **Content Strategy**: ${contentLabel !== 'None - I have my own' ? `Generate placeholder copy that is ${contentLabel}.` : 'Leave placeholders blank or use standard Lorem Ipsum as I will provide my own content.'}
 
 ## [Target AI Rules]
 ${getTargetAIRules(state.targetAI)}

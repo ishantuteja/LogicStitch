@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Sparkles } from 'lucide-react';
 import { cn } from '../../utils';
 
 interface WizardCardProps {
@@ -8,9 +8,10 @@ interface WizardCardProps {
     selected: boolean;
     onClick: () => void;
     multiselect?: boolean;
+    isRecommended?: boolean;
 }
 
-export function WizardCard({ title, imageSrc, selected, onClick, multiselect = false }: WizardCardProps) {
+export function WizardCard({ title, imageSrc, selected, onClick, multiselect = false, isRecommended = false }: WizardCardProps) {
     return (
         <motion.button
             whileHover={{ y: -4, scale: 1.02 }}
@@ -20,7 +21,8 @@ export function WizardCard({ title, imageSrc, selected, onClick, multiselect = f
                 "relative rounded-2xl overflow-hidden text-left transition-all duration-200 border-2 outline-none group",
                 selected
                     ? "border-primary-500 ring-2 ring-primary-500/20 shadow-md shadow-primary-500/10"
-                    : "border-slate-100/50 bg-white hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50"
+                    : "border-slate-100/50 bg-white hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/50",
+                isRecommended && !selected && "border-indigo-400/60 shadow-indigo-500/10"
             )}
         >
             <div className="aspect-[4/3] w-full bg-slate-100 overflow-hidden relative">
@@ -33,8 +35,18 @@ export function WizardCard({ title, imageSrc, selected, onClick, multiselect = f
                     )}
                     loading="lazy"
                 />
-                {/* Gradient overlay to ensure text readability if needed in future, but we have text below */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                {isRecommended && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute top-3 right-3 bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5"
+                    >
+                        <Sparkles className="w-3 h-3" />
+                        Recommended
+                    </motion.div>
+                )}
             </div>
 
             <div className="p-4 bg-white relative">

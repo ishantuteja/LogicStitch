@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { WizardCard } from './wizard/WizardCard';
-import { WIZARD_STEPS } from './wizard/data';
+import { WIZARD_STEPS, AI_RECOMMENDATION_MAP } from './wizard/data';
 import type { PromptState } from '../types';
 
 interface WizardProps {
@@ -97,18 +97,45 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-2">
-                            {stepConfig.options.map((option) => (
-                                <WizardCard
-                                    key={option.id}
-                                    title={option.label}
-                                    imageSrc={option.image}
-                                    selected={isOptionSelected(option.id)}
-                                    onClick={() => handleToggleOption(option.id)}
-                                    multiselect={stepConfig.multiselect}
+                        {stepConfig.type === 'text' ? (
+                            <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-4 mt-8">
+                                <input
+                                    type="text"
+                                    value={(state[stepConfig.id as keyof PromptState] as string) || ''}
+                                    onChange={(e) => updateState(stepConfig.id as keyof PromptState, e.target.value)}
+                                    placeholder="e.g. Acme Corp Landing Page"
+                                    className="w-full px-6 py-4 text-xl border-2 border-slate-200 rounded-2xl focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400 bg-white shadow-sm"
+                                    autoFocus
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && (state[stepConfig.id as keyof PromptState] as string)?.trim().length > 0) {
+                                            handleNext();
+                                        }
+                                    }}
                                 />
-                            ))}
-                        </div>
+                                <p className="mt-4 text-sm text-slate-500">Press Enter to continue</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-2">
+                                {stepConfig.options.map((option) => {
+                                    // Handle AI Recommendation logic
+                                    let isRecommended = false;
+                                    if (stepConfig.id === 'targetAI' && state.format) {
+                                        isRecommended = AI_RECOMMENDATION_MAP[state.format] === option.id;
+                                    }
+                                    return (
+                                        <WizardCard
+                                            key={option.id}
+                                            title={option.label}
+                                            imageSrc={option.image || ''}
+                                            selected={isOptionSelected(option.id)}
+                                            onClick={() => handleToggleOption(option.id)}
+                                            multiselect={stepConfig.multiselect}
+                                            isRecommended={isRecommended}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        )}
                     </motion.div>
                 </AnimatePresence>
             </div>

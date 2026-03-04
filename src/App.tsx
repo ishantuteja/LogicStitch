@@ -10,7 +10,10 @@ const initialState: PromptState = {
   format: null,
   targetAI: null,
   aesthetic: null,
+  targetAudience: null,
   features: [],
+  contentStrategy: null,
+  projectName: '',
 };
 
 function App() {
