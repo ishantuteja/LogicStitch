@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Copy, Download, Check, RefreshCw } from 'lucide-react';
+import { Copy, Download, Check, RefreshCw, Save, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface ResultProps {
     prompt: string;
+    projectName: string;
+    isLoggedIn: boolean;
     onReset: () => void;
 }
 
-export function Result({ prompt, onReset }: ResultProps) {
+export function Result({ prompt, projectName, isLoggedIn, onReset }: ResultProps) {
     const [copied, setCopied] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     const handleCopy = async () => {
         try {
@@ -29,6 +35,35 @@ export function Result({ prompt, onReset }: ResultProps) {
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
         document.body.removeChild(element);
+    };
+
+    const handleSave = async () => {
+        if (!isLoggedIn) return;
+        setIsSaving(true);
+        setSaveError(null);
+        setSaveSuccess(false);
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("User not found");
+
+            const { error } = await supabase
+                .from('saved_prompts')
+                .insert({
+                    user_id: user.id,
+                    project_name: projectName || 'Untitled Project',
+                    final_prompt: prompt
+                });
+
+            if (error) throw error;
+            setSaveSuccess(true);
+            setTimeout(() => setSaveSuccess(false), 3000);
+        } catch (err: any) {
+            console.error('Failed to save prompt:', err);
+            setSaveError(err.message || 'Failed to save to dashboard');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -61,6 +96,34 @@ export function Result({ prompt, onReset }: ResultProps) {
                         </button>
                     </div>
                 </div>
+
+                {saveError && (
+                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
+                        {saveError}
+                    </div>
+                )}
+
+                {isLoggedIn && (
+                    <div className="flex justify-end">
+                        <button
+                            onClick={handleSave}
+                            disabled={isSaving || saveSuccess}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${saveSuccess
+                                    ? 'bg-green-500 text-white hover:bg-green-600 focus:ring-green-500 shadow-green-500/20'
+                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-600 shadow-indigo-600/20'
+                                } disabled:opacity-70 disabled:cursor-not-allowed`}
+                        >
+                            {isSaving ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : saveSuccess ? (
+                                <Check className="w-4 h-4" />
+                            ) : (
+                                <Save className="w-4 h-4" />
+                            )}
+                            {isSaving ? 'Saving...' : saveSuccess ? 'Saved to Dashboard' : 'Save to Dashboard'}
+                        </button>
+                    </div>
+                )}
 
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-400 to-primary-600" />

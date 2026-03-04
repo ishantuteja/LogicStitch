@@ -1,4 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from './lib/supabase';
+import { Header } from './components/Header';
+import { AuthModal } from './components/AuthModal';
 import { Landing } from './components/Landing';
 import { Wizard } from './components/Wizard';
 import { Processing } from './components/Processing';
@@ -21,6 +25,23 @@ function App() {
   const [wizardStep, setWizardStep] = useState(0);
   const [promptState, setPromptState] = useState<PromptState>(initialState);
   const [finalPrompt, setFinalPrompt] = useState('');
+
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleUpdateState = (key: keyof PromptState, value: any) => {
     setPromptState((prev) => ({ ...prev, [key]: value }));
@@ -46,8 +67,24 @@ function App() {
     setView('landing');
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pt-16">
+      <Header
+        user={user}
+        onSignInClick={() => setIsAuthModalOpen(true)}
+        onSignOut={handleSignOut}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => setIsAuthModalOpen(false)}
+      />
+
       {view === 'landing' && <Landing onStart={startWizard} />}
 
       {view === 'wizard' && (
@@ -66,7 +103,12 @@ function App() {
       )}
 
       {view === 'result' && (
-        <Result prompt={finalPrompt} onReset={handleReset} />
+        <Result
+          prompt={finalPrompt}
+          projectName={promptState.projectName}
+          isLoggedIn={!!user}
+          onReset={handleReset}
+        />
       )}
     </div>
   );
