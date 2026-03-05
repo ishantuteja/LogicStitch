@@ -20,6 +20,7 @@ const initialState: PromptState = {
   features: [],
   contentStrategy: null,
   projectName: '',
+  extraContext: '',
 };
 
 // Protected route wrapper

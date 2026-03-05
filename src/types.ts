@@ -6,6 +6,7 @@ export interface PromptState {
     features: string[];
     contentStrategy: string | null;
     projectName: string;
+    extraContext: string;
 }
 
 export type ViewState = 'landing' | 'wizard' | 'processing' | 'result';
@@ -20,8 +21,8 @@ export interface WizardStepConfig {
     id: string;
     title: string;
     subtitle: string;
-    type: 'cards' | 'text';
+    type: 'cards' | 'text' | 'textarea';
     multiselect: boolean;
+    path?: 'short' | 'full'; // undefined = shown on ALL paths
     options: WizardOption[];
 }
-

@@ -110,6 +110,7 @@ ${getTargetAIRules(state.targetAI)}
 *(Not applicable for pure image generation, represent the following as visual dummy data only)*
 - Show states indicating active user sessions or authentication.
 - Display mock graphs, analytical charts, or payment success modals where relevant.
+${state.extraContext?.trim() ? `\n## [Additional Context from User]\n${state.extraContext.trim()}` : ''}
 `;
     }
 
@@ -149,5 +150,6 @@ ${featureLabels.length > 0 ? featureLabels.map(f => `- **${f}**: Implement requi
 3. Provide the core configuration files (package.json, tailwind.config, etc).
 4. Supply the core entry point and layout components.
 5. Provide the implementation for the core features specified.
+${state.extraContext?.trim() ? `\n## [Additional Context from User]\n${state.extraContext.trim()}` : ''}
 `;
 }
