@@ -41,7 +41,7 @@ export function WizardCard({ title, imageSrc, selected, onClick, multiselect = f
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="absolute top-3 right-3 bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5"
+                        className="absolute top-3 right-3 bg-amber-400 text-amber-900 text-xs font-bold px-2.5 py-1 rounded-full shadow-md shadow-amber-400/40 flex items-center gap-1"
                     >
                         <Sparkles className="w-3 h-3" />
                         Recommended

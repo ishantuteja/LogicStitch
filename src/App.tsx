@@ -13,12 +13,14 @@ import type { PromptState, ViewState } from './types';
 import { generatePrompt } from './lib/promptGenerator';
 
 const initialState: PromptState = {
-  format: null,
-  targetAI: null,
-  aesthetic: null,
+  category: null,
   targetAudience: null,
-  features: [],
-  contentStrategy: null,
+  techStack: null,
+  frameworks: [],
+  contentPlatform: null,
+  securityPrivacy: null,
+  toneVoice: null,
+  outputFormat: null,
   projectName: '',
   extraContext: '',
 };
