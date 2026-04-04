@@ -4,7 +4,7 @@
 
 LogicStitch is a premium, visual-first AI prompt builder designed to help users generate highly detailed, 500+ word master prompts for any AI platform (ChatGPT, Claude, Midjourney, etc.). By walking through a guided "Visual Wizard," users can define their project's category, audience, goals, and tone to receive a professionally structured blueprint.
 
-![LogicStitch Preview](logicstitch_wizard_demo_success_1772479630916.webp)
+![LogicStitch Dark Mode Preview](logicstitch_dark_theme_preview.png)
 
 ## ✨ Features
 
@@ -81,4 +81,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Built with ❤️ by [Ishant Teja](https://github.com/ishantuteja)
+[Ishan Tuteja](https://github.com/ishantuteja)
