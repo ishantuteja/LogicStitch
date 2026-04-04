@@ -1,28 +1,14 @@
-// ─── Core Prompt State ───────────────────────────────────────────────────────
 export interface PromptState {
-    // Step 1 – always
-    category: string | null; // 'software-dev' | 'content-creation' | 'business-strategy' | 'casual-creative'
-    // Step 2 – all paths
-    targetAudience: string | null;
-    // Step 3 – software-dev only
-    techStack: string | null;
-    // Step 4 – software-dev only
-    frameworks: string[];
-    // Step 5 – content-creation only
-    contentPlatform: string | null;
-    // Step 6 – software-dev | business-strategy
-    securityPrivacy: string | null;
-    // Step 7 – all paths
-    toneVoice: string | null;
-    // Step 8 – all paths
-    outputFormat: string | null;
-    // Step 9 – all paths (label for saved_prompts)
-    projectName: string;
-    // Step 10 – always last
-    extraContext: string;
+    category: string | null;         // Step 1 — always
+    audience: string | null;         // Step 2 — all paths
+    mainGoal: string | null;         // Step 3 — all paths
+    vibeOrTone: string | null;       // Step 4 — website-app OR content-copy
+    keyFeature: string | null;       // Step 5 — website-app only
+    contentPlatform: string | null;  // Step 6 — content-copy only
+    projectName: string;             // Step 7 — all paths
+    extraContext: string;            // Step 8 — always last
 }
 
-// ─── View & Wizard Config Types ──────────────────────────────────────────────
 export type ViewState = 'landing' | 'wizard' | 'processing' | 'result';
 
 export interface WizardOption {
@@ -37,7 +23,6 @@ export interface WizardStepConfig {
     subtitle: string;
     type: 'cards' | 'text' | 'textarea';
     multiselect: boolean;
-    /** If present, step is only shown when this returns true */
     condition?: (state: PromptState) => boolean;
     options: WizardOption[];
 }

@@ -1,73 +1,84 @@
-# React + TypeScript + Vite
+# LogicStitch 🧵
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Overcome blank page syndrome. Stitch together the perfect AI prompt.**
 
-Currently, two official plugins are available:
+LogicStitch is a premium, visual-first AI prompt builder designed to help users generate highly detailed, 500+ word master prompts for any AI platform (ChatGPT, Claude, Midjourney, etc.). By walking through a guided "Visual Wizard," users can define their project's category, audience, goals, and tone to receive a professionally structured blueprint.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![LogicStitch Preview](logicstitch_wizard_demo_success_1772479630916.webp)
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Visual Wizard Architecture**: A multi-step guided flow that adapts based on your project type.
+- **Four Distinct Paths**: Tailored logic for:
+  - 🌐 **Websites & Apps**: Component-level design specs and UX principles.
+  - ✍️ **Content & Copy**: Platform-specific formatting (LinkedIn, TikTok, Blogs).
+  - 📊 **Business Strategy**: Stakeholder-aligned roadmaps and next steps.
+  - 🎨 **Creative / Just for Fun**: Imaginative and expressive creative briefs.
+- **Smart Recommendations**: UI highlights suggested options based on your previous selections.
+- **Premium Dark Theme**: A sleek, high-tech "Midnight Luxury" interface with glassmorphism and ambient glow.
+- **User Dashboard**: Save your generated blueprints to your personal library (powered by Supabase).
+- **One-Click Export**: Copy to clipboard or download as a Markdown file.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS (Custom Dark Theme), Framer Motion (Animations), Lucide React (Icons)
+- **Backend / Auth**: Supabase (PostgreSQL + GoTrue)
+- **Deployment**: Vite-ready for any static hosting provider.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (v18 or higher)
+- npm or yarn
+- A Supabase project (for Authentication and Database)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/ishantuteja/LogicStitch.git
+   cd LogicStitch
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables**:
+   Create a `.env.local` file in the root directory and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Build for production**:
+   ```bash
+   npm run build
+   ```
+
+## 📂 Project Structure
+
+```text
+src/
+├── components/       # UI Components (Header, Auth, Dashboard, etc.)
+│   └── wizard/       # Wizard-specific components and data
+├── lib/              # Core logic (Prompt Generator, Supabase client)
+├── types/            # TypeScript interfaces
+└── App.tsx           # Main application routing and state
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📄 License
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+Built with ❤️ by [Ishant Teja](https://github.com/ishantuteja)

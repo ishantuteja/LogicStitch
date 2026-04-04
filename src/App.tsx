@@ -14,13 +14,11 @@ import { generatePrompt } from './lib/promptGenerator';
 
 const initialState: PromptState = {
   category: null,
-  targetAudience: null,
-  techStack: null,
-  frameworks: [],
+  audience: null,
+  mainGoal: null,
+  vibeOrTone: null,
+  keyFeature: null,
   contentPlatform: null,
-  securityPrivacy: null,
-  toneVoice: null,
-  outputFormat: null,
   projectName: '',
   extraContext: '',
 };
@@ -96,7 +94,7 @@ function HomeApp({
         <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={onSignInClick}
-            className="px-5 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-full shadow-lg hover:bg-primary-700 transition-colors"
+            className="px-5 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-full shadow-lg shadow-primary-600/25 hover:bg-primary-500 transition-colors"
           >
             Sign in to Save
           </button>
@@ -127,7 +125,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pt-16">
+    <div className="min-h-screen bg-surface-500 font-sans text-slate-100 pt-16">
       <Header
         user={user}
         onSignInClick={() => setIsAuthModalOpen(true)}

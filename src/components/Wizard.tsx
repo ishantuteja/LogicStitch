@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { WizardCard } from './wizard/WizardCard';
-import { ALL_WIZARD_STEPS, getRecommendedIds } from './wizard/data';
+import { ALL_WIZARD_STEPS, getRecommendedIds, CATEGORY_LABELS } from './wizard/data';
 import type { PromptState } from '../types';
 
 interface WizardProps {
@@ -14,19 +14,10 @@ interface WizardProps {
     setCurrentStep: (step: number) => void;
 }
 
-/** Returns which steps are visible given the current state */
 function getActiveSteps(state: PromptState) {
-    // Before category is selected, only show the first step
     if (!state.category) return [ALL_WIZARD_STEPS[0]];
     return ALL_WIZARD_STEPS.filter((s) => !s.condition || s.condition(state));
 }
-
-const PATH_LABELS: Record<string, { label: string; color: string }> = {
-    'software-dev': { label: '🔧 Heavy Path', color: 'bg-violet-100 text-violet-700' },
-    'content-creation': { label: '✍️ Medium Path', color: 'bg-blue-100 text-blue-700' },
-    'business-strategy': { label: '📊 Medium Path', color: 'bg-amber-100 text-amber-700' },
-    'casual-creative': { label: '⚡ Light Path', color: 'bg-green-100 text-green-700' },
-};
 
 export function Wizard({ state, updateState, onComplete, onCancel, currentStep, setCurrentStep }: WizardProps) {
     const activeSteps = getActiveSteps(state);
@@ -35,50 +26,38 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const handleNext = () => {
-        if (isLastStep) {
-            onComplete();
-        } else {
-            setCurrentStep(currentStep + 1);
-        }
+        if (isLastStep) onComplete();
+        else setCurrentStep(currentStep + 1);
     };
 
     const handleBack = () => {
-        if (currentStep === 0) {
-            onCancel();
-        } else {
-            setCurrentStep(currentStep - 1);
-        }
+        if (currentStep === 0) onCancel();
+        else setCurrentStep(currentStep - 1);
     };
 
     const handleSelectOption = (optionId: string) => {
         const key = stepConfig.id as keyof PromptState;
-
         if (stepConfig.multiselect) {
-            const currentVal = (state[key] as string[]) || [];
+            const currentVal = (state[key] as unknown as string[]) || [];
             const isSelected = currentVal.includes(optionId);
             updateState(key, isSelected ? currentVal.filter((id) => id !== optionId) : [...currentVal, optionId]);
         } else {
             updateState(key, optionId);
-            // Auto-advance on single-select (with slight delay for visual feedback)
-            // Selecting category resets step to 1 automatically
             if (stepConfig.id === 'category') {
-                // Reset all category-conditional fields when changing category
-                updateState('techStack', null);
-                updateState('frameworks', []);
+                // Reset conditional fields when category changes
+                updateState('vibeOrTone', null);
+                updateState('keyFeature', null);
                 updateState('contentPlatform', null);
-                updateState('securityPrivacy', null);
-                setTimeout(() => {
-                    setCurrentStep(1);
-                }, 450);
+                setTimeout(() => setCurrentStep(1), 420);
             } else {
-                setTimeout(handleNext, 400);
+                setTimeout(handleNext, 380);
             }
         }
     };
 
     const isOptionSelected = (optionId: string) => {
         const val = state[stepConfig.id as keyof PromptState];
-        if (stepConfig.multiselect) return (val as string[]).includes(optionId);
+        if (stepConfig.multiselect) return (val as unknown as string[]).includes(optionId);
         return val === optionId;
     };
 
@@ -90,26 +69,25 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
             const v = state[stepConfig.id as keyof PromptState];
             return typeof v === 'string' && (v as string).trim().length > 0;
         }
-        if (stepConfig.multiselect) return (state[stepConfig.id as keyof PromptState] as string[]).length > 0;
         return state[stepConfig.id as keyof PromptState] !== null;
     })();
 
-    const pathInfo = state.category ? PATH_LABELS[state.category] : null;
+    const pathInfo = state.category ? CATEGORY_LABELS[state.category] : null;
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
 
-            {/* Progress Bar */}
+            {/* Progress */}
             <div className="w-full max-w-5xl mb-10 flex flex-col items-center">
                 <div className="flex items-center gap-1.5 mb-2 flex-wrap justify-center">
                     {activeSteps.map((_, i) => (
                         <div
                             key={i}
                             className={`h-1.5 rounded-full transition-all duration-500 ${i < currentStep
-                                    ? 'bg-primary-500 w-10'
-                                    : i === currentStep
-                                        ? 'bg-primary-500 w-14'
-                                        : 'bg-slate-200 w-10'
+                                ? 'bg-primary-500 w-10 shadow-sm shadow-primary-500/40'
+                                : i === currentStep
+                                    ? 'bg-primary-400 w-14 shadow-md shadow-primary-400/50'
+                                    : 'bg-white/10 w-10'
                                 }`}
                         />
                     ))}
@@ -126,7 +104,7 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Content */}
             <div className="w-full max-w-5xl flex-1 flex flex-col">
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -134,60 +112,60 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.28 }}
                         className="flex flex-col flex-1"
                     >
-                        {/* Step header */}
                         <div className="text-center mb-10">
-                            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">
                                 {stepConfig.title}
                             </h2>
-                            <p className="text-lg text-slate-500">{stepConfig.subtitle}</p>
+                            <p className="text-lg text-slate-400">{stepConfig.subtitle}</p>
                         </div>
 
-                        {/* ── Textarea ── */}
+                        {/* Textarea */}
                         {stepConfig.type === 'textarea' && (
                             <div className="flex flex-col items-center w-full max-w-3xl mx-auto px-4">
                                 <textarea
                                     ref={textareaRef}
                                     rows={8}
-                                    value={(state.extraContext as string) || ''}
+                                    value={state.extraContext || ''}
                                     onChange={(e) => updateState('extraContext', e.target.value)}
-                                    placeholder="e.g. The primary CTA must be 'Get Started Free'. The brand palette is #6C63FF and #FFFFFF. A product demo video placeholder should appear in the hero section..."
-                                    className="w-full px-6 py-4 text-base border-2 border-slate-200 rounded-2xl focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400 bg-white shadow-sm resize-none leading-relaxed"
+                                    placeholder="e.g. The hero headline should be 'Build faster, launch smarter.' Use a dark background. Keep every section super short — three sentences max..."
+                                    className="w-full px-6 py-4 text-base border border-white/[0.08] rounded-2xl focus:border-primary-500/50 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none text-slate-100 placeholder:text-slate-600 bg-white/[0.04] shadow-sm resize-none leading-relaxed"
                                     autoFocus
                                 />
-                                <p className="mt-3 text-sm text-slate-400">
-                                    This is optional — press{' '}
-                                    <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-xs font-mono">
+                                <p className="mt-3 text-sm text-slate-500">
+                                    Totally optional — hit{' '}
+                                    <kbd className="px-1.5 py-0.5 bg-white/[0.06] border border-white/[0.1] rounded text-xs font-mono text-slate-400">
                                         Skip
                                     </kbd>{' '}
-                                    to generate without extra context.
+                                    if you're good to go.
                                 </p>
                             </div>
                         )}
 
-                        {/* ── Text Input ── */}
+                        {/* Text input */}
                         {stepConfig.type === 'text' && (
-                            <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-4 mt-8">
+                            <div className="flex flex-col items-center w-full max-w-2xl mx-auto p-4 mt-8">
                                 <input
                                     type="text"
                                     value={(state[stepConfig.id as keyof PromptState] as string) || ''}
                                     onChange={(e) => updateState(stepConfig.id as keyof PromptState, e.target.value)}
-                                    placeholder="e.g. Acme Corp Q3 Campaign"
-                                    className="w-full px-6 py-4 text-xl border-2 border-slate-200 rounded-2xl focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all outline-none text-slate-900 placeholder:text-slate-400 bg-white shadow-sm"
+                                    placeholder="e.g. Summer Launch Campaign"
+                                    className="w-full px-6 py-4 text-xl border border-white/[0.08] rounded-2xl focus:border-primary-500/50 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none text-white placeholder:text-slate-600 bg-white/[0.04] shadow-sm"
                                     autoFocus
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && canProceed) handleNext();
-                                    }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' && canProceed) handleNext(); }}
                                 />
                                 <p className="mt-4 text-sm text-slate-500">Press Enter to continue</p>
                             </div>
                         )}
 
-                        {/* ── Card Grid ── */}
+                        {/* Card grid */}
                         {stepConfig.type === 'cards' && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-2">
+                            <div className={`grid gap-5 p-2 ${stepConfig.options.length <= 4
+                                ? 'grid-cols-1 sm:grid-cols-2'
+                                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                                }`}>
                                 {stepConfig.options.map((option) => (
                                     <WizardCard
                                         key={option.id}
@@ -205,11 +183,11 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
                 </AnimatePresence>
             </div>
 
-            {/* Navigation Footer */}
-            <div className="w-full max-w-5xl mt-10 flex items-center justify-between pt-6 border-t border-slate-200">
+            {/* Nav footer */}
+            <div className="w-full max-w-5xl mt-10 flex items-center justify-between pt-6 border-t border-white/[0.06]">
                 <button
                     onClick={handleBack}
-                    className="flex items-center gap-2 px-6 py-3 text-slate-600 font-medium rounded-full hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                    className="flex items-center gap-2 px-6 py-3 text-slate-400 font-medium rounded-full hover:bg-white/[0.06] hover:text-white transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5" />
                     {currentStep === 0 ? 'Home' : 'Back'}
@@ -219,7 +197,7 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
                     {stepConfig.type === 'textarea' && (
                         <button
                             onClick={onComplete}
-                            className="px-6 py-3 text-slate-500 font-medium rounded-full hover:bg-slate-100 transition-colors"
+                            className="px-6 py-3 text-slate-500 font-medium rounded-full hover:bg-white/[0.06] hover:text-slate-300 transition-colors"
                         >
                             Skip
                         </button>
@@ -227,13 +205,12 @@ export function Wizard({ state, updateState, onComplete, onCancel, currentStep, 
                     <button
                         onClick={handleNext}
                         disabled={!canProceed && stepConfig.type !== 'textarea'}
-                        className="flex items-center gap-2 px-8 py-3 bg-primary-600 text-white font-bold rounded-full hover:bg-primary-700 shadow-md shadow-primary-500/20 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+                        className="flex items-center gap-2 px-8 py-3 bg-primary-600 text-white font-bold rounded-full hover:bg-primary-500 shadow-lg shadow-primary-600/25 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        {isLastStep ? (
-                            <><Sparkles className="w-5 h-5" /> Stitch Blueprint</>
-                        ) : (
-                            <>Next Step <ArrowRight className="w-5 h-5" /></>
-                        )}
+                        {isLastStep
+                            ? <><Sparkles className="w-5 h-5" /> Build My Prompt</>
+                            : <>Next <ArrowRight className="w-5 h-5" /></>
+                        }
                     </button>
                 </div>
             </div>

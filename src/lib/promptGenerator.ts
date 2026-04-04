@@ -5,157 +5,129 @@ function getLabel(stepId: string, optionId: string | null | undefined): string {
     if (!optionId) return '';
     const step = WIZARD_STEPS.find((s) => s.id === stepId);
     if (!step) return optionId;
-    const option = step.options.find((o) => o.id === optionId);
-    return option ? option.label : optionId;
-}
-
-function getLabels(stepId: string, optionIds: string[]): string[] {
-    const step = WIZARD_STEPS.find((s) => s.id === stepId);
-    if (!step) return optionIds;
-    return optionIds.map((id) => {
-        const option = step.options.find((o) => o.id === id);
-        return option ? option.label : id;
-    });
+    const opt = step.options.find((o) => o.id === optionId);
+    return opt ? opt.label : optionId;
 }
 
 export function generatePrompt(state: PromptState): string {
-    const categoryLabel = getLabel('category', state.category);
-    const audienceLabel = getLabel('targetAudience', state.targetAudience);
-    const toneLabel = getLabel('toneVoice', state.toneVoice);
-    const outputLabel = getLabel('outputFormat', state.outputFormat);
-    const projectName = state.projectName?.trim() || 'My Project';
-    const techLabel = getLabel('techStack', state.techStack);
-    const frameworkLabels = getLabels('frameworks', state.frameworks ?? []);
+    const audienceLabel = getLabel('audience', state.audience);
+    const mainGoalLabel = getLabel('mainGoal', state.mainGoal);
+    const vibeLabel = getLabel('vibeOrTone', state.vibeOrTone);
+    const featureLabel = getLabel('keyFeature', state.keyFeature);
     const platformLabel = getLabel('contentPlatform', state.contentPlatform);
-    const securityLabel = getLabel('securityPrivacy', state.securityPrivacy);
+    const projectName = state.projectName?.trim() || 'My Project';
 
-    const extraSection = state.extraContext?.trim()
-        ? `\n## [Additional Context from User]\n${state.extraContext.trim()}`
+    const extra = state.extraContext?.trim()
+        ? `\n## Extra Details from User\n${state.extraContext.trim()}`
         : '';
 
-    // ── Software Development ──────────────────────────────────────────────────
-    if (state.category === 'software-dev') {
-        return `# Master Engineering Blueprint: ${projectName}
+    // ── Website / App ─────────────────────────────────────────────────────────
+    if (state.category === 'website-app') {
+        return `# Website / App Blueprint: "${projectName}"
 
-## [Project Overview]
-You are an expert Full-Stack Engineer and Software Architect. Your task is to produce a comprehensive, production-ready implementation plan and code structure for a **${categoryLabel}** project named **"${projectName}"**.
-Do not hallucinate libraries. Stick to the specified stack and best practices.
+## What We're Building
+You are an expert product designer and UI/UX developer. Create a detailed, actionable plan and design specification for a website or app idea called **"${projectName}"**.
 
-## [Target Audience]
-This system is designed for: **${audienceLabel || 'developers/technical users'}**.
-Ensure all interfaces, error messages, and documentation are calibrated for this audience.
+## Who It's For
+**Primary audience**: ${audienceLabel || 'General users'}
+Make sure every part of the experience — language, layout, and calls to action — is perfectly tailored for this group.
 
-## [Tech Stack]
-- **Primary Language**: ${techLabel || 'Not specified — infer from context'}
-${frameworkLabels.length > 0 ? `- **Frameworks / Libraries**: ${frameworkLabels.join(', ')}` : '- **Frameworks**: Choose widely adopted, well-maintained options for the above language.'}
+## The Main Goal
+**Primary objective**: ${mainGoalLabel || 'Drive engagement'}
+Every design decision should serve this goal. Prioritise clarity and conversion.
 
-## [Security & Data Privacy]
-- **Security Posture**: ${securityLabel || 'Standard best practices'}
-- Enforce input validation, parameterized queries, and principle of least privilege throughout.
-- Specify any auth provider (e.g., Supabase Auth, NextAuth, Passport.js) and token lifecycle management.
+## Tone & Visual Vibe
+**Style**: ${vibeLabel || 'Clean and Modern'}
+Apply this consistently across headlines, button labels, illustrations, and micro-copy.
 
-## [Tone & Output Format]
-- **Tone**: ${toneLabel || 'Technical & Precise'}
-- **Output Format**: ${outputLabel || 'Markdown with code blocks'}
-- Use rich Markdown, fenced code blocks, and architecture diagrams where applicable.
+## Most Important Feature
+**Core feature to nail**: ${featureLabel || 'Core user experience'}
+Design this feature first. Make it impossible to miss and effortless to use.
 
-## [Execution Steps]
-1. Provide a brief architectural summary and tech decisions rationale.
-2. Output the recommended folder structure.
-3. Supply all core configuration files (package.json, tsconfig, tailwind.config, etc.).
-4. Implement core entry point and layout components.
-5. Build out the primary features with clean, commented code.
-6. List edge cases, error handling strategies, and optimization notes.
-${extraSection}
+## What to Deliver
+1. A clear summary of the product concept (2–3 sentences).
+2. The page structure / key screens layout.
+3. Suggested headlines, subheadings, and button copy.
+4. A short list of "must-have" design principles for this project.
+5. Any recommended tools or platforms to build it quickly (no jargon — plain English).
+${extra}
 `;
     }
 
-    // ── Content Creation ──────────────────────────────────────────────────────
-    if (state.category === 'content-creation') {
-        return `# Master Content Blueprint: ${projectName}
+    // ── Content / Copy ────────────────────────────────────────────────────────
+    if (state.category === 'content-copy') {
+        return `# Content Blueprint: "${projectName}"
 
-## [Content Overview]
-You are an expert Content Strategist and Copywriter. Your task is to create compelling, high-impact content for **"${projectName}"**.
-The content must be tailored to the platform, audience, and tone defined below.
+## What We're Creating
+You are an expert copywriter and content strategist. Write compelling, high-impact content for a project called **"${projectName}"**.
 
-## [Target Audience]
-- **Primary Audience**: ${audienceLabel || 'General audience'}
-- Calibrate vocabulary, complexity, hook style, and CTA language to perfectly fit this audience.
+## Who It's For
+**Target audience**: ${audienceLabel || 'General audience'}
+Every word should speak directly to this person — use their language, reference their world.
 
-## [Platform & Distribution]
-- **Primary Platform**: ${platformLabel || 'Not specified'}
-- Follow platform-specific best practices (character limits, formatting, hashtag strategy, posting cadence).
+## The Goal
+**What this content needs to do**: ${mainGoalLabel || 'Inform and engage'}
+Lead with value, get to the point fast, and end with a clear next step.
 
-## [Tone & Voice]
-- **Voice**: ${toneLabel || 'Engaging & Conversational'}
-- Every sentence should feel intentional. Avoid fluff. Lead with value.
+## Tone & Voice
+**Communication style**: ${vibeLabel || 'Engaging and clear'}
+Be consistent. If it's casual, stay casual. If it's bold, commit to it.
 
-## [Output Format]
-- **Format**: ${outputLabel || 'Structured with headings'}
-- Include: hook, body, CTA, and any platform-specific elements (e.g., LinkedIn carousel slides, Twitter thread structure).
+## Platform
+**Where it will be published**: ${platformLabel || 'Not specified — write for general use'}
+Follow all platform conventions: length, formatting, hashtags, line breaks, and hook style.
 
-## [Deliverables]
-1. A primary content piece (full post / article / script as applicable).
-2. 3 headline/hook variations for A/B testing.
-3. A short-form version (suitable for repurposing).
-4. Suggested hashtags or SEO keywords.
-${extraSection}
+## Deliverables
+1. The main content piece (full post, article, email, or script as relevant).
+2. Three alternative hook/opening line options.
+3. A punchy short version (for repurposing or previewing).
+4. 5 relevant hashtags or SEO keywords.
+${extra}
 `;
     }
 
     // ── Business Strategy ─────────────────────────────────────────────────────
     if (state.category === 'business-strategy') {
-        return `# Master Strategy Blueprint: ${projectName}
+        return `# Strategy Blueprint: "${projectName}"
 
-## [Strategic Overview]
-You are a Senior Business Strategist and Management Consultant. Your task is to develop a clear, actionable strategy document for **"${projectName}"**.
-Ground all recommendations in data and logical frameworks. Avoid vague platitudes.
+## What We're Planning
+You are a senior business strategist. Develop a clear, practical strategy document for a project called **"${projectName}"**.
+Base every recommendation on sound reasoning. Avoid fluff — be direct and specific.
 
-## [Target Audience]
-- **Decision-Makers**: ${audienceLabel || 'Business stakeholders'}
-- Tailor language and depth to this audience's level of domain expertise.
+## Who This Serves
+**Key stakeholders**: ${audienceLabel || 'Business team'}
+Write in a way that resonates with this audience — calibrate depth and language accordingly.
 
-## [Security & Compliance Requirements]
-- **Data Governance**: ${securityLabel || 'Standard compliance'}
-- Identify risk surface areas and recommend mitigation strategies within the strategic plan.
+## The Primary Objective
+**What success looks like**: ${mainGoalLabel || 'Achieving meaningful business results'}
+Keep this front and centre throughout every recommendation.
 
-## [Tone & Voice]
-- **Communication Style**: ${toneLabel || 'Professional & Authoritative'}
-- Be direct, use precise business language, and support all assertions with rationale.
-
-## [Output Format]
-- **Document Format**: ${outputLabel || 'Structured Report (Headings, Tables)'}
-- Use executive summary, supporting sections, tables for comparisons, and a clear action plan.
-
-## [Document Structure]
-1. **Executive Summary** — problem, opportunity, and recommended course of action.
-2. **Situation Analysis** — market, competitive landscape, internal strengths/weaknesses.
-3. **Strategic Options** — 2–3 viable options with pros, cons, and risk assessment.
-4. **Recommended Strategy** — rationale, KPIs, and success metrics.
-5. **Action Plan** — milestones, owners, and timeline.
-${extraSection}
+## Document Structure to Produce
+1. **Summary** — the situation, the opportunity, and the recommended direction (half a page max).
+2. **Context** — key facts, challenges, and assumptions.
+3. **Options** — 2–3 realistic paths forward, each with pros, cons, and rough feasibility.
+4. **Recommended Path** — your single clearest recommendation with rationale.
+5. **Next Steps** — 3–5 specific actions with owners and suggested timelines.
+${extra}
 `;
     }
 
-    // ── Casual / Creative ─────────────────────────────────────────────────────
-    return `# Creative Blueprint: ${projectName}
+    // ── Just for Fun / Creative ───────────────────────────────────────────────
+    return `# Creative Brief: "${projectName}"
 
-## [Overview]
-You are a creative collaborator helping with **"${projectName}"** — a ${categoryLabel} project.
-Be imaginative, responsive, and helpful. Match the energy of the prompt.
+## Let's Get Creative
+You're a creative collaborator helping bring **"${projectName}"** to life.
+Be imaginative, specific, and expressive. This is the fun one — don't hold back.
 
-## [Audience]
-${audienceLabel ? `This is aimed at: **${audienceLabel}**.` : 'Tailor the output to a broad, general audience.'}
+## The Audience
+${audienceLabel ? `This is for **${audienceLabel}** — shape the energy and tone around them.` : 'This is for a broad, general audience — keep it accessible and universally enjoyable.'}
 
-## [Tone & Voice]
-- **Style**: ${toneLabel || 'Creative & Expressive'}
-- Let ideas breathe. Use vivid language and concrete examples.
+## The Goal
+${mainGoalLabel ? `We want to **${mainGoalLabel.toLowerCase()}**. Let that drive every creative decision.` : 'Create something that leaves a lasting impression.'}
 
-## [Output Format]
-- **Format**: ${outputLabel || 'Plain prose / narrative'}
-
-## [Deliverables]
-Generate the best creative output for this project. Prioritize originality, clarity, and engagement.
-${extraSection}
+## What to Create
+Produce the best, most creative output for this brief. Prioritise originality and delight.
+Use vivid language, strong imagery, and ideas that feel fresh.
+${extra}
 `;
 }
